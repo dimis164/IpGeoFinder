@@ -54,7 +54,7 @@ namespace Natech.IpGeoFinder.DAL.Repositories
 
         public string GetProgressMsgById(Guid batchId)
         {
-            var batchList = _context.BatchDetails.ToList();
+            var batchList = _context.BatchDetails.Where(o => o.BatchId == batchId).ToList();
             int completedCalls = batchList.Where(o => o.FetchedDateTime is not null).Count();
             DateTime maxTime = batchList.Where(o => o.FetchedDateTime is not null).Select(o => o.FetchedDateTime).Max().ToNonNullable();
             DateTime minTime = batchList.Where(o => o.FetchedDateTime is not null).Select(o => o.FetchedDateTime).Min().ToNonNullable();
