@@ -2,7 +2,6 @@
 using Natech.IpGeoFinder.Api.Model;
 using Natech.IpGeoFinder.DAL.DataTypes;
 using Natech.IpGeoFinder.DAL.Interfaces;
-using Natech.IpGeoFinder.DAL.Repositories;
 using System;
 using System.Threading.Tasks;
 
@@ -26,23 +25,22 @@ namespace Natech.IpGeoFinder.Api.Utilities
 
             Batch batch = new Batch()
             {
+                Id = Guid.NewGuid(),
                 InsertionDateTime = DateTime.Now,
                 StatusId = 1
             };
 
             _repositoryDB.Add(batch);
 
-            foreach (var batchIp in batchIps.Ip)
+            foreach (var ip in batchIps.Ip)
             {
-
-                var result = _repository.GetGeo(batchIp).Result;
-                var r = _mapper.Map<BatchDetail>(result);
-                r.FetchedDateTime = DateTime.Now;
-                batch.BatchDetails.Add(r);
-
-                //Κανονικα θα το εβγαζα εξω απο το foreach αλλα το θυσιαζω για να βλεπω το proggress απο την ΒΔ.
-                await _repositoryDB.SaveChangesAsync();
+                batch.BatchDetails.Add(new BatchDetail { Ip = ip });
             }
+
+
+            await _repositoryDB.SaveChangesAsync();
+
+
 
             return batch.Id;
 

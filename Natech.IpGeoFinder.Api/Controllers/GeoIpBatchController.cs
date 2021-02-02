@@ -1,17 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Natech.IpGeoFinder.DAL.Repositories;
-using Natech.IpGeoFinder.Api.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Natech.IpGeoFinder.DAL.Interfaces;
-using Natech.IpGeoFinder.DAL.DataTypes;
-using Natech.IpGeoFinder.Api.Utilities;
 using Microsoft.AspNetCore.Routing;
-
+using Natech.IpGeoFinder.Api.BackgroundServices;
+using Natech.IpGeoFinder.Api.Model;
+using Natech.IpGeoFinder.Api.Utilities;
+using Natech.IpGeoFinder.DAL.Interfaces;
+using System;
+using System.Threading.Tasks;
 
 namespace Natech.IpGeoFinder.Api.Controllers
 {
@@ -23,13 +19,15 @@ namespace Natech.IpGeoFinder.Api.Controllers
         private readonly IGeoIpRepository _repository;
         private readonly IGeoIpDbRepository _repositoryDB;
         private readonly LinkGenerator _linkGenerator;
+        private readonly BatchProcessingChannel _batchProcessingChannel;
 
-        public GeoIpBatchController(IMapper mapper, IGeoIpRepository repository, IGeoIpDbRepository repositoryDB, LinkGenerator linkGenerator)
+        public GeoIpBatchController(IMapper mapper, IGeoIpRepository repository, IGeoIpDbRepository repositoryDB, LinkGenerator linkGenerator, BatchProcessingChannel batchProcessingChannel)
         {
             _mapper = mapper;
             _repository = repository;
             _repositoryDB = repositoryDB;
             _linkGenerator = linkGenerator;
+            _batchProcessingChannel = batchProcessingChannel;
 
         }
 
@@ -41,16 +39,21 @@ namespace Natech.IpGeoFinder.Api.Controllers
                 BatchProcessor br = new BatchProcessor(_mapper, _repository, _repositoryDB);
                 Guid batchid = await br.ProccessIps(iPs);
 
+                var batchAdded = await _batchProcessingChannel.AddBatchAsync(batchid);
 
+                if (batchAdded)
+                {
+                    var link = _linkGenerator.GetPathByAction(
+                         HttpContext,
+                         "Get",
+                         values: new { id = batchid });
 
-                var link = _linkGenerator.GetPathByAction(
-                          HttpContext,
-                          "Get",
-                          values: new { id = batchid });
+                    var fullLink = $" { HttpContext.Request.Scheme }://{ HttpContext.Request.Host}{link}";
 
-                var fullLink = $" { HttpContext.Request.Scheme }://{ HttpContext.Request.Host}{link}";
+                    return Created(link, fullLink);
+                }
 
-                return Created(link, fullLink);
+                return this.StatusCode(StatusCodes.Status500InternalServerError);
             }
             catch (Exception)
             {
@@ -60,7 +63,7 @@ namespace Natech.IpGeoFinder.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(Guid id)
+        public IActionResult Get(Guid id)
         {
             try
             {

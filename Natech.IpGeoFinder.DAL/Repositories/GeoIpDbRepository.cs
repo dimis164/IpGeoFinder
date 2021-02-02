@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Natech.IpGeoFinder.DAL.DataTypes;
 using Natech.IpGeoFinder.DAL.Interfaces;
+using Natech.IpGeoFinder.DAL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Natech.IpGeoFinder.DAL.Utilities;
 
 
 namespace Natech.IpGeoFinder.DAL.Repositories
@@ -68,8 +67,8 @@ namespace Natech.IpGeoFinder.DAL.Repositories
             if (completedCalls != batchList.Count)
             {
                 msg += $"Finish Estimation: { DateTime.Now.AddSeconds((totalSeconds / completedCalls) * (batchList.Count - completedCalls))}";
-            }        
-                     
+            }
+
 
             //var msg = completedCalls.ToString();
             //msg += "/";

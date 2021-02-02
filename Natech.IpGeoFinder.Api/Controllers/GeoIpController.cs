@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Natech.IpGeoFinder.Api.Model;
+using Natech.IpGeoFinder.DAL.Interfaces;
 using System;
 using System.Threading.Tasks;
-using Natech.IpGeoFinder.DAL.Interfaces;
-using Microsoft.AspNetCore.Routing;
 
 namespace Natech.IpGeoFinder.Api.Controllers
 {

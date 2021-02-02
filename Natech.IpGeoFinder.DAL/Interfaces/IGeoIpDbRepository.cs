@@ -1,8 +1,6 @@
 ﻿using Natech.IpGeoFinder.DAL.DataTypes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Natech.IpGeoFinder.DAL.Interfaces
@@ -16,7 +14,7 @@ namespace Natech.IpGeoFinder.DAL.Interfaces
 
         //Batch
         Batch GetBatchById(Guid batchId);
-        bool ChangeBatchStatusById(Guid batchId,Status status);
+        bool ChangeBatchStatusById(Guid batchId, Status status);
 
         //BatchDetails
         Task<List<BatchDetail>> GetBatchDetailsById(Guid batchId);

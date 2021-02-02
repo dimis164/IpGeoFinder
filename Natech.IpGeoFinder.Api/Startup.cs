@@ -1,21 +1,15 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+using Natech.IpGeoFinder.Api.BackgroundServices;
+using Natech.IpGeoFinder.DAL;
 using Natech.IpGeoFinder.DAL.Interfaces;
 using Natech.IpGeoFinder.DAL.Repositories;
-using Natech.IpGeoFinder.DAL;
+using System.Reflection;
 
 namespace Natech.IpGeoFinder.Api
 {
@@ -31,8 +25,12 @@ namespace Natech.IpGeoFinder.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<GeoIpDBContext>();
             services.AddScoped<IGeoIpDbRepository, GeoIpDbRepository>();
+            //services.AddSingleton<IGeoIpDbRepository, GeoIpDbRepository>();
+            services.AddSingleton<BatchProcessingChannel>();
+            services.AddHostedService<BatchService>();
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddScoped<IGeoIpRepository, GeoIpRepository>();
